@@ -81,11 +81,11 @@ export default function App() {
       {/* Toast Notification Container */}
       <div className="toast-container">
         {toasts.map((toast) => (
-          <div key={toast.id} className={`toast ${toast.type}`}>
+          <div key={toast.id} className="toast">
             {toast.type === 'success' ? (
-              <CheckCircle2 size={18} style={{ color: 'var(--success)', flexShrink: 0 }} />
+              <CheckCircle2 size={17} style={{ color: 'var(--black)', flexShrink: 0 }} />
             ) : (
-              <AlertCircle size={18} style={{ color: 'var(--danger)', flexShrink: 0 }} />
+              <AlertCircle size={17} style={{ color: 'var(--black)', flexShrink: 0 }} />
             )}
             <span className="toast-message">{toast.message}</span>
           </div>

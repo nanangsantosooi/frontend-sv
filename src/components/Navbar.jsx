@@ -1,13 +1,34 @@
-import React from 'react';
-import { Newspaper, FileText, PlusCircle, Eye, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Newspaper, FileText, PlusCircle, Eye } from 'lucide-react';
+import articleApi from '../api/articleApi';
 
-export default function Navbar({ activeView, setActiveView, counts }) {
+export default function Navbar({ activeView, setActiveView }) {
+  const [isBackendOnline, setIsBackendOnline] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const verifyConnection = async () => {
+      const online = await articleApi.checkHealth();
+      if (isMounted) {
+        setIsBackendOnline(online);
+      }
+    };
+    verifyConnection();
+
+    // Check periodically
+    const interval = setInterval(verifyConnection, 15000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
     <nav className="navbar">
       <div className="navbar-inner">
         <div className="brand" onClick={() => setActiveView('posts')} style={{ cursor: 'pointer' }}>
           <div className="brand-icon">
-            <Newspaper size={20} />
+            <Newspaper size={18} />
           </div>
           <span>Sharing Vision</span>
           <span className="brand-badge">CMS</span>
@@ -19,7 +40,7 @@ export default function Navbar({ activeView, setActiveView, counts }) {
             className={`nav-item ${activeView === 'posts' ? 'active' : ''}`}
             onClick={() => setActiveView('posts')}
           >
-            <FileText size={18} />
+            <FileText size={17} />
             <span>All Posts</span>
           </button>
 
@@ -28,7 +49,7 @@ export default function Navbar({ activeView, setActiveView, counts }) {
             className={`nav-item ${activeView === 'add' ? 'active' : ''}`}
             onClick={() => setActiveView('add')}
           >
-            <PlusCircle size={18} />
+            <PlusCircle size={17} />
             <span>Add New</span>
           </button>
 
@@ -37,14 +58,27 @@ export default function Navbar({ activeView, setActiveView, counts }) {
             className={`nav-item ${activeView === 'preview' ? 'active' : ''}`}
             onClick={() => setActiveView('preview')}
           >
-            <Eye size={18} />
+            <Eye size={17} />
             <span>Preview</span>
           </button>
         </div>
 
-        <div className="server-status" title="Golang API Server Running on port 8080">
-          <div className="status-dot"></div>
-          <span>API Connected</span>
+        {/* Dynamic Status Indicator */}
+        <div
+          className="server-status"
+          title={
+            isBackendOnline
+              ? 'Terhubung langsung ke REST API Golang (Port 8080)'
+              : 'Berjalan dalam mode Demo Browser Storage (Bisa CRUD & Tabulasi secara mandiri)'
+          }
+        >
+          <div
+            className="status-dot"
+            style={{
+              background: isBackendOnline ? 'var(--black)' : 'var(--text-light)',
+            }}
+          ></div>
+          <span>{isBackendOnline ? 'API Connected' : 'Demo Mode (Active)'}</span>
         </div>
       </div>
     </nav>
